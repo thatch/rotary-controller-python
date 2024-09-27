@@ -1,6 +1,7 @@
 #: import Factory kivy.factory.Factory
 #: import Keypad components.keypad
 #: import ImageButton components.toolbars.image_button
+#: import ArrowsPopup components.arrows_popup
 
 <CoordBar>:
   orientation: "horizontal"
@@ -98,4 +99,4 @@
     background_color: [0.5, 0.5, 0.5, 1]
     width: self.height
     size_hint_x: None
-    on_release: root.zero_position()
+    on_release: root.mock_func(self)

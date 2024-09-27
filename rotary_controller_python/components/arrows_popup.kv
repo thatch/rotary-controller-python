@@ -1,0 +1,33 @@
+#: import ImageButton components.toolbars.image_button
+
+<KeypadButton@Button>:
+  font_size: 32
+  font_name: "fonts/Manrope-Bold.ttf"
+
+<KeypadIconButton@KeypadButton>:
+  font_name: "fonts/Font Awesome 6 Free-Solid-900.otf"
+  text: "\uf55a"
+
+<ArrowsPopup>:
+  size_hint: None, None
+
+  BoxLayout:
+    width: root.width
+    height: root.height
+    orientation: "vertical"
+    BoxLayout:
+      orientation: "horizontal"
+      KeypadButton:
+        text: "L"
+#        on_release: root.ids.value.text+= self.text
+      KeypadButton:
+        text: "U"
+#        on_release: root.ids.value.text+= self.text
+    BoxLayout:
+      orientation: "horizontal"
+      KeypadButton:
+        text: "D"
+#        on_release: root.ids.value.text+= self.text
+      KeypadButton:
+        text: "R"
+#        on_release: root.ids.value.text+= self.text

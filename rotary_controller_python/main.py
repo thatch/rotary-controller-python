@@ -25,10 +25,12 @@ from kivy.core.window import Window
 
 log = Logger.getChild(__name__)
 
-Window.show_cursor = False
+# Window.show_cursor = False
 
 for h in log.root.handlers:
-    h.formatter = KivyFormatter('%(asctime)s - %(filename)s:%(lineno)s-%(funcName)s - %(levelname)s - %(message)s')
+    h.formatter = KivyFormatter(
+        "%(asctime)s - %(filename)s:%(lineno)s-%(funcName)s - %(levelname)s - %(message)s"
+    )
 
 
 class MainApp(App):
@@ -57,10 +59,18 @@ class MainApp(App):
     currentOffset = NumericProperty(0)
     tool = NumericProperty(0)
     serial_port = ConfigParserProperty(
-        defaultvalue="/dev/serial0", section="device", key="serial_port", config=config, val_type=str
+        defaultvalue="/dev/serial0",
+        section="device",
+        key="serial_port",
+        config=config,
+        val_type=str,
     )
     serial_baudrate = ConfigParserProperty(
-        defaultvalue="115200", section="device", key="baudrate", config=config, val_type=int
+        defaultvalue="115200",
+        section="device",
+        key="baudrate",
+        config=config,
+        val_type=int,
     )
     serial_address = ConfigParserProperty(
         defaultvalue=17, section="device", key="address", config=config, val_type=int
@@ -79,9 +89,11 @@ class MainApp(App):
             self.connection_manager = communication.ConnectionManager(
                 serial_device=self.serial_port,
                 baudrate=self.serial_baudrate,
-                address=self.serial_address
+                address=self.serial_address,
             )
-            self.device = devices.Global(connection_manager=self.connection_manager, base_address=0)
+            self.device = devices.Global(
+                connection_manager=self.connection_manager, base_address=0
+            )
 
         except Exception as e:
             log.error(f"Communication cannot be started, will try again: {e.__str__()}")
@@ -100,11 +112,7 @@ class MainApp(App):
         """
         Loads the specified help file text from the help files folder.
         """
-        help_file_path = os.path.join(
-            os.path.dirname(__file__),
-            "help",
-            help_file_name
-        )
+        help_file_path = os.path.join(os.path.dirname(__file__), "help", help_file_name)
         if not os.path.exists(help_file_path):
             return "Help file not found"
 
@@ -122,7 +130,7 @@ class MainApp(App):
 
     def update(self, *args):
         try:
-            self.fast_data_values = self.device['fastData'].refresh()
+            self.fast_data_values = self.device["fastData"].refresh()
 
         except Exception as e:
             log.error(f"No connection: {e.__str__()}")

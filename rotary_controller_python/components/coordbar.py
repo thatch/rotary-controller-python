@@ -9,7 +9,14 @@ from kivy.logger import Logger
 from kivy.factory import Factory
 from kivy.clock import Clock
 from kivy.lang import Builder
-from kivy.properties import NumericProperty, StringProperty, ObjectProperty, ListProperty, BooleanProperty, DictProperty
+from kivy.properties import (
+    NumericProperty,
+    StringProperty,
+    ObjectProperty,
+    ListProperty,
+    BooleanProperty,
+    DictProperty,
+)
 from kivy.uix.boxlayout import BoxLayout
 from kivy.app import App
 
@@ -62,6 +69,7 @@ class CoordBar(BoxLayout, SavingDispatcher):
 
     def __init__(self, servo: ServoBar, **kv):
         from rotary_controller_python.main import MainApp
+
         self.app: MainApp = App.get_running_app()
         super().__init__(**kv)
 
@@ -74,7 +82,7 @@ class CoordBar(BoxLayout, SavingDispatcher):
         self.app.formats.bind(factor=self.set_sync_ratio)
         self.app.bind(connected=self.init_connection)
         self.app.bind(update_tick=self.update_tick)
-        Clock.schedule_interval(self.speed_task, 1.0/25.0)
+        Clock.schedule_interval(self.speed_task, 1.0 / 25.0)
 
         # Private variables that don't need dispatchers etc
         self.encoderPrevious = 0
@@ -84,7 +92,7 @@ class CoordBar(BoxLayout, SavingDispatcher):
         """
         This method is called when the connection is established
         """
-        self.syncEnable = self.device['scales'][self.inputIndex]['syncEnable']
+        self.syncEnable = self.device["scales"][self.inputIndex]["syncEnable"]
         self.set_sync_ratio()
 
     def update_tick(self, *args, **kv):
@@ -93,16 +101,20 @@ class CoordBar(BoxLayout, SavingDispatcher):
                 return
 
             self.encoderPrevious = self.encoderCurrent
-            self.encoderCurrent = self.app.fast_data_values['scaleCurrent'][self.inputIndex]
-            self.position += uint32_subtract_to_int32(self.encoderCurrent, self.encoderPrevious)
+            self.encoderCurrent = self.app.fast_data_values["scaleCurrent"][
+                self.inputIndex
+            ]
+            self.position += uint32_subtract_to_int32(
+                self.encoderCurrent, self.encoderPrevious
+            )
         except Exception as e:
             log.error(f"Unable to update scale: {e.__str__()}")
 
     def toggle_sync(self):
         if not self.app.connected:
             return
-        self.syncEnable = not self.device['scales'][self.inputIndex]['syncEnable']
-        self.device['scales'][self.inputIndex]['syncEnable'] = self.syncEnable
+        self.syncEnable = not self.device["scales"][self.inputIndex]["syncEnable"]
+        self.device["scales"][self.inputIndex]["syncEnable"] = self.syncEnable
 
     def set_sync_ratio(self, *args, **kv):
         scale_ratio = Fraction(self.ratioNum, self.ratioDen) * self.app.formats.factor
@@ -110,8 +122,8 @@ class CoordBar(BoxLayout, SavingDispatcher):
         sync_ratio = Fraction(self.syncRatioNum, self.syncRatioDen)
 
         final_ratio = scale_ratio * sync_ratio / servo_ratio
-        self.device['scales'][self.inputIndex]['syncRatioNum'] = final_ratio.numerator
-        self.device['scales'][self.inputIndex]['syncRatioDen'] = final_ratio.denominator
+        self.device["scales"][self.inputIndex]["syncRatioNum"] = final_ratio.numerator
+        self.device["scales"][self.inputIndex]["syncRatioDen"] = final_ratio.denominator
 
     def on_syncRatioNum(self, instance, value):
         if self.app.home is None:
@@ -133,15 +145,23 @@ class CoordBar(BoxLayout, SavingDispatcher):
         self.update_scaledPosition()
 
     def update_scaledPosition(self, *args, **kv):
-        self.scaledPosition = float(
-            self.position * Fraction(self.ratioNum, self.ratioDen) + self.offsets[self.app.currentOffset]
-        ) * self.app.formats.factor
+        self.scaledPosition = (
+            float(
+                self.position * Fraction(self.ratioNum, self.ratioDen)
+                + self.offsets[self.app.currentOffset]
+            )
+            * self.app.formats.factor
+        )
 
         if self.spindleMode:
-            self.formattedPosition = self.app.formats.angle_speed_format.format(self.speed)
+            self.formattedPosition = self.app.formats.angle_speed_format.format(
+                self.speed
+            )
             self.formattedSpeed = self.app.formats.angle_speed_format.format(self.speed)
         else:
-            self.formattedPosition = self.app.formats.position_format.format(self.scaledPosition)
+            self.formattedPosition = self.app.formats.position_format.format(
+                self.scaledPosition
+            )
             self.formattedSpeed = self.app.formats.speed_format.format(self.speed)
 
     def on_newPosition(self, instance, value):
@@ -150,7 +170,9 @@ class CoordBar(BoxLayout, SavingDispatcher):
     def set_current_position(self, value):
         # 0 is the reference position for the DRO when offset 0 is selected we reset the absolute position of the scale
         if self.app.currentOffset == 0:
-            self.position = float(value / self.app.formats.factor / Fraction(self.ratioNum, self.ratioDen))
+            self.position = float(
+                value / self.app.formats.factor / Fraction(self.ratioNum, self.ratioDen)
+            )
             self.offsets[self.app.currentOffset] = 0
         else:
             raw_position = self.position * Fraction(self.ratioNum, self.ratioDen)
@@ -161,10 +183,21 @@ class CoordBar(BoxLayout, SavingDispatcher):
 
     def update_position(self):
         if not self.spindleMode:
-            Factory.Keypad().show_with_callback(self.set_current_position, self.scaledPosition)
+            Factory.Keypad().show_with_callback(
+                self.set_current_position, self.scaledPosition
+            )
 
     def zero_position(self):
         self.set_current_position(0)
+
+    def mock_func(self, caller):
+        from rotary_controller_python.components.arrows_popup import ArrowsPopup
+        from kivy.core.window import Window
+
+        popup = ArrowsPopup(
+            x=caller.x, y=caller.y, height=caller.height, width=caller.width
+        )
+        Window.add_widget(popup)
 
     def speed_task(self, *args, **kv):
         if self.app is None or self.app.fast_data_values is None:
@@ -177,9 +210,11 @@ class CoordBar(BoxLayout, SavingDispatcher):
             return
 
         current_time = time.time()
-        steps_per_second = self.app.fast_data_values.get('scaleSpeed', [0] * SCALES_COUNT)[self.inputIndex]
+        steps_per_second = self.app.fast_data_values.get(
+            "scaleSpeed", [0] * SCALES_COUNT
+        )[self.inputIndex]
         self.speed_history.append(steps_per_second)
-        avg_steps_per_second = (sum(self.speed_history) / len(self.speed_history))
+        avg_steps_per_second = sum(self.speed_history) / len(self.speed_history)
 
         # Calculate Revs/Min for spindleMode
         if self.spindleMode:
@@ -188,9 +223,17 @@ class CoordBar(BoxLayout, SavingDispatcher):
         # Calculate feeds
         if not self.spindleMode:
             if self.app.formats.current_format == "MM":
-                self.speed = float(avg_steps_per_second * 60 * (1 / self.stepsPerMM) * (1 / 1000))
+                self.speed = float(
+                    avg_steps_per_second * 60 * (1 / self.stepsPerMM) * (1 / 1000)
+                )
             if self.app.formats.current_format == "IN":
-                self.speed = float(avg_steps_per_second * 60 * (1 / self.stepsPerMM) * (1 / 1000) * (120 / 254))
+                self.speed = float(
+                    avg_steps_per_second
+                    * 60
+                    * (1 / self.stepsPerMM)
+                    * (1 / 1000)
+                    * (120 / 254)
+                )
 
         self.previous_axis_time = current_time
         self.previous_axis_pos = self.position
