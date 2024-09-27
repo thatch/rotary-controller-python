@@ -17,17 +17,31 @@
     orientation: "vertical"
     BoxLayout:
       orientation: "horizontal"
+      Label:
+        text: "(UL)"
+      KeypadButton:
+        text: "U"
+#        on_release: root.ids.value.text+= self.text
+      Label:
+        text: "(UR)"
+    BoxLayout:
+      orientation: "horizontal"
       KeypadButton:
         text: "L"
 #        on_release: root.ids.value.text+= self.text
       KeypadButton:
-        text: "U"
+        text: "M"
 #        on_release: root.ids.value.text+= self.text
-    BoxLayout:
-      orientation: "horizontal"
-      KeypadButton:
-        text: "D"
-#        on_release: root.ids.value.text+= self.text
+        on_release: root.dismiss()
       KeypadButton:
         text: "R"
 #        on_release: root.ids.value.text+= self.text
+    BoxLayout:
+      orientation: "horizontal"
+      Label:
+        text: "(DL)"
+      KeypadButton:
+        text: "D"
+#        on_release: root.ids.value.text+= self.text
+      Label:
+        text: "(DR)"

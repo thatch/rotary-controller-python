@@ -195,7 +195,8 @@ class CoordBar(BoxLayout, SavingDispatcher):
         from kivy.core.window import Window
 
         popup = ArrowsPopup(
-            x=caller.x, y=caller.y, height=caller.height, width=caller.width
+            x=caller.x-100, y=caller.y-100, height=caller.height+200,
+            width=caller.width+200
         )
         Window.add_widget(popup)
 
